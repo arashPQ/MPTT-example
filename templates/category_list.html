@@ -1,0 +1,136 @@
+{% load mptt_tags %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Tree</title>
+    <style>
+        .mptt-tree {
+            list-style-type: none;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .mptt-tree ul {
+            padding-left: 25px;
+            margin: 5px 0;
+            display: none;
+        }
+        
+        .mptt-tree > li > ul {
+            display: block;
+        }
+        
+        .mptt-tree li {
+            margin: 8px 0;
+            position: relative;
+        }
+        
+        .tree-node {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        
+        .tree-node:hover {
+            background-color: #e3f2fd;
+            transform: translateX(5px);
+        }
+        
+        .tree-link {
+            text-decoration: none;
+            color: #2c3e50;
+            flex-grow: 1;
+        }
+        
+        .tree-link:hover {
+            color: #2980b9;
+        }
+        
+        .toggle-icon {
+            margin-right: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .children {
+            border-left: 2px dashed #bdc3c7;
+        }
+        
+        .category-icon {
+            margin-right: 8px;
+        }
+        
+        .item-count {
+            background: #6c757d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Course category</h1>
+        
+        <ul class="mptt-tree">
+            {% recursetree categories %}
+                <li>
+                    <div class="tree-node">
+                        <span class="item-count">Level {{ node.level }}</span>
+                        
+                        <a href="#" class="tree-link">
+                            <span class="category-icon">
+                                {% if node.is_leaf_node %}📄{% else %}📂{% endif %}
+                            </span>
+                            {{ node.name }}
+                        </a>
+                        
+                        {% if not node.is_leaf_node %}
+                            <span class="toggle-icon" onclick="toggleChildren(this)">▶</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if not node.is_leaf_node %}
+                        <ul class="children">
+                            {{ children }}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endrecursetree %}
+        </ul>
+    </div>
+
+    <script>
+        function toggleChildren(element) {
+            const childrenList = element.parentElement.nextElementSibling;
+            if (childrenList.style.display === 'none' || !childrenList.style.display) {
+                childrenList.style.display = 'block';
+                element.textContent = '▼';
+            } else {
+                childrenList.style.display = 'none';
+                element.textContent = '▶';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.children').forEach(function(childList) {
+                childList.style.display = 'none';
+            });
+            
+            // Set all icons to closed state
+            document.querySelectorAll('.toggle-icon').forEach(function(icon) {
+                icon.textContent = '▶';
+            });
+        });
+    </script>
+</body>
+</html>
